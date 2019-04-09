@@ -1,6 +1,12 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
 const chalk = require('chalk');
+const yellow = chalk.bold.yellowBright;
+const green = chalk.bold.greenBright;
+const cyan = chalk.bold.cyanBright;
+const red = chalk.redBright;
+const magenta = chalk.bold.magentaBright;
+//var Table = require('cli-table3');
 
 var connection = mysql.createConnection({
   host: "localhost",
@@ -25,11 +31,19 @@ connection.connect(function(err) {
 // Include the ids, names, and prices of products for sale.
 
 function display() {
+   // var table = new Table({style:{border:[],header:[]}});
+
+    
     var query = "SELECT item_id, product_name, price from products GROUP BY item_id";
     connection.query(query, function(err, res) {
         console.log("\n");
         for (var i = 0; i < res.length; i++) {
-          console.log(chalk.bold.yellowBright(res[i].item_id)+" | "+chalk.bold.greenBright(res[i].product_name)+chalk.bold.cyanBright("  Price: $"+res[i].price));
+            // table.push([
+            //     colors.yellow(res[i].item_id),
+            //     colors.green(res[i].product_name),
+            //     colors.blue(res[i].price)
+            //   ]);
+          console.log(yellow(res[i].item_id)+" | "+green(res[i].product_name)+cyan("  Price: $"+res[i].price));
         }
     });
 }
@@ -42,18 +56,18 @@ function search() {
             // Here we create a basic text prompt.
             {
                 type: "input",
-                message: chalk.yellowBright("Please enter the ID of the product you would like to buy?"),
+                message: yellow("Please enter the ID of the product you would like to buy?"),
                 name: "itemID",
             }, 
             {
                 type: "input",
-                message:chalk.greenBright("How many units of the product do you would like to buy?"),
+                message:green("How many units of the product do you would like to buy?"),
                 name: "itemUnits"
             },
             {
                 name: "confirm",
                 type: "list",
-                message: chalk.red("Are you sure you want to buy this product?"),
+                message: red("Are you sure you want to buy this product?"),
                 choices: [
                     "YES",
                     "NO"
@@ -89,17 +103,17 @@ function selectItem(itemNum,quantity){
         console.log("\n");
         if(res[0].stock_quantity>=quantity)
         {    
-        console.log(chalk.bold.yellowBright(quantity)+" | "+chalk.bold.greenBright(res[0].product_name)+chalk.bold.cyanBright("  Price: $"+res[0].price));
+        console.log(yellow(quantity)+" | "+green(res[0].product_name)+cyan("  Price: $"+res[0].price));
         let subtotal =res[0].price * quantity;
-        console.log(chalk.bold.yellowBright("Subtotal: "+quantity+" x "+res[0].price+" = "+chalk.bold.cyanBright("$"+(subtotal))));
+        console.log(yellow("Subtotal: "+quantity+" x "+res[0].price+" = "+cyan("$"+(subtotal))));
         let gst = 0.13*res[0].price * quantity;
-        console.log(chalk.bold.yellowBright("GST/PST: "+chalk.bold.cyanBright("$"+(gst))));
-        console.log(chalk.bold.yellowBright("Total: "+chalk.bold.cyanBright("$"+(subtotal+gst))));
-        console.log(chalk.bold.magentaBright("Thanks for shopping with us Today!!"));
+        console.log(yellow("GST/PST: "+cyan("$"+(gst))));
+        console.log(yellow("Total: "+cyan("$"+(subtotal+gst))));
+        console.log(magenta("Thanks for shopping with us Today!!"));
 
         updateQuantity(itemNum,quantity); 
         }else{
-            console.log(chalk.bold.magentaBright("Sorry we have stock at the moment. Please try again next week."));
+            console.log(magenta("Sorry we don't have stock at the moment. Please try again next week."));
         }
     });
 }
@@ -145,7 +159,7 @@ function stillContinue(){
         {
             name: "confirm",
             type: "list",
-            message: chalk.greenBright("Do you still want to continue shopping with us?"),
+            message: green("Do you still want to continue shopping with us?"),
             choices: [
                 "YES",
                 "NO"
