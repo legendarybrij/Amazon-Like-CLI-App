@@ -34,17 +34,10 @@ function display() {
    // var table = new Table({style:{border:[],header:[]}});
 
     
-    var query = "SELECT item_id, product_name, price from products GROUP BY item_id";
+    var query = "SELECT item_id 'Item ID', product_name 'Product Name', price 'Price' from products GROUP BY item_id";
     connection.query(query, function(err, res) {
         console.log("\n");
-        for (var i = 0; i < res.length; i++) {
-            // table.push([
-            //     colors.yellow(res[i].item_id),
-            //     colors.green(res[i].product_name),
-            //     colors.blue(res[i].price)
-            //   ]);
-          console.log(yellow(res[i].item_id)+" | "+green(res[i].product_name)+cyan("  Price: $"+res[i].price));
-        }
+        console.table(res);
     });
 }
 
@@ -86,6 +79,7 @@ function search() {
 
         }else{
             // *********************************Asking First Time Continue if Yes**************************************
+            console.log(red("Please enter valid integer or number for Product ID and Units"));
             display();
             search();
         }    

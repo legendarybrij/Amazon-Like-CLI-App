@@ -68,15 +68,21 @@ function menuOptions() {
 }
 
 
-
 function viewProducts(){
          
-         var query = "SELECT item_id, product_name, price, stock_quantity from products GROUP BY item_id";
+         var query = "SELECT item_id 'ITEM ID', product_name 'Product Name', price 'Price', stock_quantity 'Stock Quantity' from products GROUP BY item_id";
          connection.query(query, function(err, res) {
              console.log("\n");
-             for (var i = 0; i < res.length; i++) {
-               console.log(yellow(res[i].item_id)+" | "+green(res[i].product_name)+cyan("  Price: $"+res[i].price)+magenta("  Quantity: "+res[i].stock_quantity));
-             }
+                    console.table(res);
+        // ********************To make index numbers same as item_id*******************
+                    // var object = {};
+                    // for (var i = 0; i < res.length; i++) {
+                    //     var id = res[i].item_id;
+                    //     delete res[i].item_id;
+                    //     object[id] = res[i];
+                    // }
+                    // console.table(object);
+        // ********************To make index numbers same as item_id*******************
          });
          back();
 }
@@ -84,12 +90,10 @@ function viewProducts(){
 
 function viewLowInventory(){
          
-    var query = "SELECT item_id, product_name, price, stock_quantity from products GROUP BY item_id having stock_quantity<6";
+    var query = "SELECT item_id 'ITEM ID', product_name 'Product Name', price 'Price', stock_quantity 'Stock Quantity' from products GROUP BY item_id having stock_quantity<6";
     connection.query(query, function(err, res) {
         console.log("\n");
-        for (var i = 0; i < res.length; i++) {
-          console.log(yellow(res[i].item_id)+" | "+green(res[i].product_name)+cyan("  Price: $"+res[i].price)+magenta("  Quantity: "+res[i].stock_quantity));
-        }
+        console.table(res);
     });
     back();
 
@@ -134,6 +138,7 @@ function addInventory(){
         }
     ])
     .then(function(answer) {
+
       if(isNaN(answer.add.trim())===false && answer.add.trim()!=="" && isNaN(answer.addQuantity.trim())===false && answer.addQuantity.trim()!=="")
       {
         let itemID = answer.add.trim();
@@ -191,26 +196,28 @@ function addNewProduct(){
         }
     ])
     .then(function(answer) {
-        console.log("Price: "+answer.price.trim()+" Name: "+answer.name.trim()+" DEpartment: "+answer.department.trim());
+
         if(isNaN(answer.price.trim())===false && answer.price.trim()!=="" && isNaN(answer.name.trim())===true && answer.name.trim()!=="" && isNaN(answer.department.trim())===true && answer.department.trim()!=="" )
-        {
-            var query = connection.query(
+        {   console.log(" Price: "+answer.price.trim()+" Name: "+answer.name.trim()+" DEpartment: "+answer.department.trim());
+            connection.query(
                 "INSERT into products (product_name, department_name, price) VALUES (?,?,?)",
-                [
-                {
-                     product_name: answer.name.trim()
-                },
-                {
-                     department_name: answer.department.trim()
-                },
-                {
-                     price: answer.price.trim()
-                }
-                ],
+                [ answer.name.trim(), answer.department.trim(), answer.price.trim()],
                 function(err, res) {
-                    console.log("\nUpdated Rows: "+res.affectedRows);
+                    if (err)
+                    {
+                    if (err.code == 'ER_DUP_ENTRY' || err.errno == 1062) {
+                        console.log('Error: Product is already exist. Please try it again');
+
+                    }else {
+                        console.log(err);
+                    } 
+                    addNewProduct();
+                    } else {
+                        console.log("\nUpdated Rows: "+res.affectedRows);
+                        back();  
+                    }
                 });
-            back();    
+              
         }else {
             console.log(red("Please enter valid input"));
             addNewProduct();
